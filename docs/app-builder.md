@@ -1,4 +1,4 @@
-# The PWA builder
+# The app builder
 
 Every Looyaal install produces one branded, installable customer app (a Progressive Web App) for the cafe. Nothing is compiled per cafe: the app is a single React shell that reads a small JSON configuration, turns it into CSS custom properties ("design tokens"), and picks one of several interchangeable components for each slot of the screen ("variants").
 

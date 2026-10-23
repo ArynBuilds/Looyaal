@@ -12,7 +12,7 @@ Turn your website into a branded, installable loyalty app in minutes, then let a
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-self--hosted-3FCF8E?logo=supabase&logoColor=white)
 
-[Quick start](#quick-start) · [How it works](#how-it-works) · [Engines](docs/engines.md) · [PWA builder](docs/pwa-builder.md) · [Self-hosting](docs/self-hosting.md) · [API](docs/api.md)
+[Quick start](#quick-start) · [How it works](#how-it-works) · [Engines](docs/engines.md) · [App builder](docs/app-builder.md) · [Self-hosting](docs/self-hosting.md) · [API](docs/api.md)
 
 </div>
 
@@ -31,7 +31,7 @@ Everything runs on your own server with `docker compose up`. One install, one ca
 - [Features](#features)
 - [How it works](#how-it-works)
 - [The three apps](#the-three-apps)
-- [The PWA builder](#the-pwa-builder)
+- [The app builder](#the-app-builder)
 - [The intelligence engines](#the-intelligence-engines)
 - [Quick start](#quick-start)
 - [Configuration](#configuration)
@@ -146,7 +146,7 @@ Details: [docs/architecture.md](docs/architecture.md). Interactive system map: [
 
 First run: the owner creates the single owner account, then an onboarding wizard builds the app (website URL, brand extraction, color, logo, banner, style, shape, stamp card, photos, font, density, language, layout, location).
 
-## The PWA builder
+## The app builder
 
 ```
 website URL ─▶ extractor ─▶ draft answers ─▶ wizard ─▶ variant mapper ─▶ pwa_config ─▶ tokens + variants ─▶ app
@@ -158,7 +158,7 @@ website URL ─▶ extractor ─▶ draft answers ─▶ wizard ─▶ variant m
 - **Mapping** (`lib/variant-mapper.ts`): pools chosen by the answers and assets, a deterministic hash pick seeded by brand color and style, and an override that mirrors the website's dominant layout.
 - **Installability**: per-cafe manifest, logo-derived maskable icons rendered with `sharp`, a service worker with push and click tracking.
 
-Full walkthrough: [docs/pwa-builder.md](docs/pwa-builder.md).
+Full walkthrough: [docs/app-builder.md](docs/app-builder.md).
 
 ## The intelligence engines
 
@@ -303,7 +303,7 @@ lib/
 supabase/migrations/         schema, RLS, SQL functions, storage buckets
 docker/                      Kong, database roles, migration runner
 scripts/                     generate-secrets.mjs, icon generation, checks
-docs/                        architecture, engines, PWA builder, self-hosting, API
+docs/                        architecture, engines, app builder, self-hosting, API
 instrumentation.ts           starts the scheduler
 proxy.ts                     routing and auth gate
 docker-compose.yml           full stack

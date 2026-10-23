@@ -53,7 +53,7 @@ On `docker compose up`, the `migrate` service applies every file in `supabase/mi
 ## First run
 
 1. Open the app URL. With no owner yet, Looyaal shows a one-time **Create owner account** screen (name, cafe name, email, password). It is refused once an organization exists.
-2. Sign in. The onboarding wizard builds the cafe's app: website URL (brand extraction), color, logo, banner, style, shape, stamp card, photos, font, density, language, layout and the first location. See `docs/pwa-builder.md`.
+2. Sign in. The onboarding wizard builds the cafe's app: website URL (brand extraction), color, logo, banner, style, shape, stamp card, photos, font, density, language, layout and the first location. See `docs/app-builder.md`.
 3. In the dashboard, add your menu, then go to **Branches** to print the branch QR code for the counter and add baristas. Each barista pairs their own phone by scanning a setup QR (valid 24 hours).
 4. Customers scan the branch QR or open your domain, enter their phone number and get their first stamp. The customer app lives at `/` of your domain.
 5. Set `DISABLE_SIGNUP=true` in `.env` and run `docker compose up -d auth` to close the public GoTrue sign-up endpoint (baristas are created through the admin API and are not affected).

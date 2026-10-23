@@ -56,7 +56,7 @@ Changes to scoring, learning or attribution logic should come with a small execu
 - **Tenancy**: every new table gets `org_id`, RLS enabled and a policy using `get_user_org_id()`. Tables holding tokens or secrets get RLS with no policies (service role only).
 - **Schema changes** go in a new, timestamped file in `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql`). Never edit an applied migration; the `migrate` service applies files once, in filename order. Regenerate `types/database.ts` when the schema changes.
 - **Time**: store timestamps in UTC; store derived local fields (day of week, hour) in the location's time zone using `lib/timezone.ts`.
-- **UI variants** use only design tokens (`var(--...)`) and `cqw` units; see [docs/pwa-builder.md](docs/pwa-builder.md#13-adding-a-new-variant).
+- **UI variants** use only design tokens (`var(--...)`) and `cqw` units; see [docs/app-builder.md](docs/app-builder.md#13-adding-a-new-variant).
 - **Copy**: customer-facing text is Turkish first today; keep new strings easy to extract for translation. No emojis in the UI.
 - **Never build backend without UI or UI without backend.** A feature is done when an owner, barista or customer can use it.
 - **Engines**: keep scoring functions pure (no database calls) like `lib/nba-engine.ts`, and document new constants in `docs/engines.md`.
