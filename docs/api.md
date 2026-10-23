@@ -94,7 +94,7 @@ Authentication types used in the tables:
 
 ## Jobs (`/api/cron/*`)
 
-All accept `POST` (and `GET`) with the cron secret. See the schedule in the README and the behaviour in `docs/engines.md`.
+All accept `POST` (and `GET`) with the cron secret. See the schedule in [self-hosting](self-hosting.md#scheduled-jobs) and the behaviour in [engines](engines.md).
 
 `daily-intelligence`, `notification-queue`, `campaign-scheduler`, `hourly-weather`, `birthday-check`, `weekly-rfm`, `weekly-model-update`, `weekly-measurement`, `sync-reviews`, `discover-influencers`, `cleanup-influencers`, `dead-hour-trigger` (no-op kept for compatibility; dead-hour targeting runs inside `daily-intelligence`).
 

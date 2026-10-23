@@ -14,6 +14,7 @@ Looyaal is one Next.js 16 application (App Router, TypeScript, React 19) in fron
 - [10. Background work](#10-background-work)
 - [11. External integrations](#11-external-integrations)
 - [12. Source layout](#12-source-layout)
+- [13. Tech stack](#13-tech-stack)
 
 ---
 
@@ -266,7 +267,7 @@ A claimed offer that is never scanned returns to `active` after 5 minutes (night
 
 Jobs are ordinary route handlers under `app/api/cron/`. `instrumentation.ts` starts an in-process scheduler (`lib/scheduler/`) when the Node.js server boots: it aligns to the minute, matches each job's 5-field cron expression **in UTC**, and calls `POST /api/cron/<job>` on the same server with the cron secret, never running two instances of the same job concurrently (15-minute timeout per run). Set `LOOYAAL_SCHEDULER=off` to drive the same endpoints from an external cron instead.
 
-The schedule and what each job does are listed in the README and explained in `docs/engines.md`.
+The schedule and what each job does are listed in [self-hosting](self-hosting.md#scheduled-jobs) and explained in [engines](engines.md).
 
 ---
 
@@ -324,3 +325,18 @@ public/sw.js               service worker
 instrumentation.ts         starts the scheduler
 proxy.ts                   routing and auth gate
 ```
+
+---
+
+## 13. Tech stack
+
+| Layer | Technology |
+| --- | --- |
+| App | Next.js 16 (App Router, standalone output), React 19, TypeScript (strict) |
+| UI | Tailwind CSS 4, Motion, Lucide icons, Recharts |
+| Validation | Zod |
+| Data | Supabase: Postgres 15, GoTrue, PostgREST, Storage, Kong; `@supabase/ssr` |
+| PWA | Web App Manifest, service worker, Web Push (`web-push`, VAPID) |
+| Counter | `html5-qrcode` scanner, `qrcode` / `qrcode.react` |
+| Extraction and images | `cheerio`, `sharp`, `browser-image-compression` |
+| Runtime | Node.js 22, Docker Compose |

@@ -111,17 +111,40 @@ Production checklist:
 
 ## Configuration
 
-`.env.example` documents every variable; the README has the full table. The essentials:
+All variables are documented in [`.env.example`](../.env.example). `NEXT_PUBLIC_*` values are compiled into the browser bundle: rebuild with `docker compose up -d --build app` after changing them.
 
-| Variable | Required | Purpose |
+| Variable | Required | Description |
 | --- | --- | --- |
-| `NEXT_PUBLIC_APP_URL` | yes | public app URL, used for links, OAuth redirects and the scheduler |
-| `NEXT_PUBLIC_SUPABASE_URL` | yes | public Kong URL |
-| `POSTGRES_PASSWORD`, `JWT_SECRET`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | yes | Supabase |
-| `CRON_SECRET`, `QR_TOKEN_SECRET`, `BARISTA_SETUP_SECRET`, `CUSTOMER_SESSION_SECRET`, `POS_WEBHOOK_SECRET` | yes | app secrets |
-| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | yes | push notifications |
-| `LOOYAAL_SCHEDULER` | no | `on` (default) or `off` |
-| `OPENWEATHERMAP_API_KEY`, `GOOGLE_CLIENT_ID/SECRET`, `META_APP_ID/SECRET` | no | integrations |
+| `NEXT_PUBLIC_APP_URL` | yes | Public URL of the app (customers, staff, OAuth redirects) |
+| `NEXT_PUBLIC_SUPABASE_URL` | yes | Public URL of the Supabase gateway (Kong) |
+| `APP_PORT`, `KONG_HTTP_PORT` | no | Host ports (default 3000 and 8000) |
+| `POSTGRES_PASSWORD` | yes | Database password (generated; do not change after first start) |
+| `JWT_SECRET` | yes | Supabase JWT signing secret (generated) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes | Public anon key (generated) |
+| `SUPABASE_SERVICE_ROLE_KEY` | yes | Service-role key, server only (generated) |
+| `JWT_EXPIRY` | no | Access token lifetime in seconds (3600) |
+| `SUPABASE_SERVER_URL` | no | Internal Supabase URL for server calls (compose sets `http://kong:8000`) |
+| `DISABLE_SIGNUP` | no | Set `true` after the owner account exists |
+| `ENABLE_EMAIL_AUTOCONFIRM` | no | `true` skips email confirmation; set `false` once SMTP works |
+| `ADDITIONAL_REDIRECT_URLS` | no | Extra auth redirect URLs |
+| `SMTP_ADMIN_EMAIL`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_SENDER_NAME` | no | Email for confirmations and password resets |
+| `CRON_SECRET` | yes | Bearer token for `/api/cron/*` (generated) |
+| `QR_TOKEN_SECRET` | yes | Customer QR tokens (generated) |
+| `BARISTA_SETUP_SECRET` | yes | Barista pairing tokens (generated) |
+| `CUSTOMER_SESSION_SECRET` | yes | Customer session cookie signature (generated) |
+| `POS_WEBHOOK_SECRET` | yes | Shared secret for POS webhooks (generated) |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | yes | Web Push key pair (generated) |
+| `VAPID_SUBJECT` | no | Push contact, for example `mailto:you@yourcafe.com` |
+| `TZ` | recommended | Cafe time zone for send hours and quiet hours, for example `Europe/Lisbon` |
+| `LOOYAAL_SCHEDULER` | no | `on` (default) runs jobs in-process; `off` to use an external cron |
+| `LOOYAAL_SCHEDULER_URL` | no | Base URL the scheduler calls (default `http://127.0.0.1:$PORT`) |
+| `OPENWEATHERMAP_API_KEY` | no | Enables weather-aware targeting |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | no | Enables Google review sync and replies |
+| `META_APP_ID`, `META_APP_SECRET` | no | Enables Instagram influencer discovery |
+| `DASHBOARD_USERNAME`, `DASHBOARD_PASSWORD`, `PG_META_CRYPTO_KEY` | no | Supabase Studio (`--profile studio`) |
+| `ENABLE_IMAGE_TRANSFORMATION` | no | Image resizing via imgproxy (`--profile imgproxy`) |
+
+Optional integrations switch themselves off when their keys are empty.
 
 `SUPABASE_SERVER_URL` is set to `http://kong:8000` by compose; set it yourself only when running the app outside compose against a Supabase whose public URL is not reachable from the server.
 
@@ -132,11 +155,51 @@ Two clocks matter:
 - **Cron schedules are evaluated in UTC** (`lib/scheduler/jobs.ts`).
 - **Local-time logic**: dead-hour detection and visit statistics use each location's `timezone` column (default `Europe/Istanbul`, edit it per branch), while push send hours and quiet hours are computed in the **server's** local time zone.
 
-Add `TZ=<IANA zone>` (for example `TZ=Europe/Lisbon`) to `.env` so the app container's local time is the cafe's, and set each location's `timezone` to the same zone. If you change `TZ`, review the job times in the README: for example `notification-queue` delivers between 09:00 and 21:45 UTC by default; shift the schedule in `lib/scheduler/jobs.ts` (or your external cron) to cover the cafe's opening hours.
+Add `TZ=<IANA zone>` (for example `TZ=Europe/Lisbon`) to `.env` so the app container's local time is the cafe's, and set each location's `timezone` to the same zone. If you change `TZ`, review the job times in [Scheduled jobs](#scheduled-jobs): for example `notification-queue` delivers between 09:00 and 21:45 UTC by default; shift the schedule in `lib/scheduler/jobs.ts` (or your external cron) to cover the cafe's opening hours.
 
 ## Scheduled jobs
 
 By default the app runs its own scheduler (`instrumentation.ts`): it ticks every minute and calls `POST /api/cron/<job>` on itself with the cron secret. Logs look like `[scheduler] daily-intelligence -> 200 in 4211ms`.
+
+| Job | Schedule (UTC) | What it does |
+| --- | --- | --- |
+| `cleanup-influencers` | daily 03:00 | Deletes stale or rejected discoveries and data of disconnected accounts |
+| `weekly-rfm` | Mon 04:00 | Recomputes RFM scores and segments in SQL |
+| `weekly-model-update` | Mon 04:30 | Shop intelligence: effective discount, click rate, weather sensitivity |
+| `daily-intelligence` | daily 05:00 | Churn, preferences, dead hours, NBA decisions, dead-hour targeting, challenges, learning |
+| `weekly-measurement` | daily 06:00 | Incremental lift and ROI over the last 7 days (needs a holdback group) |
+| `discover-influencers` | daily 06:00 | Hashtag-driven local influencer discovery |
+| `birthday-check` | daily 07:00 | Birthday push and same-day free-item offer |
+| `sync-reviews` | 07:00, 13:00, 19:00 | Google review import, sentiment, reply drafts |
+| `hourly-weather` | hourly 08:00-21:00 | Weather per location city |
+| `dead-hour-trigger` | hourly 08:00-21:00 | No-op kept for compatibility |
+| `notification-queue` | every 15 min, 09:00-21:45 | Delivers due pushes within quiet hours and caps |
+| `campaign-scheduler` | every 15 min, 09:00-21:45 | Starts scheduled owner campaigns |
+
+```mermaid
+gantt
+    title A day of jobs (UTC)
+    dateFormat HH:mm
+    axisFormat %H:%M
+    section Nightly
+    cleanup-influencers      :03:00, 10m
+    weekly-rfm (Mon)         :04:00, 10m
+    weekly-model-update (Mon):04:30, 10m
+    daily-intelligence       :crit, 05:00, 30m
+    weekly-measurement       :06:00, 10m
+    discover-influencers     :06:00, 20m
+    section Morning
+    birthday-check           :07:00, 10m
+    sync-reviews             :07:00, 10m
+    section Daytime
+    hourly-weather           :08:00, 780m
+    notification-queue (15m) :active, 09:00, 765m
+    campaign-scheduler (15m) :09:00, 765m
+    sync-reviews             :13:00, 10m
+    sync-reviews             :19:00, 10m
+```
+
+Push send hours and quiet hours use the server's local time, so set `TZ` and align the daytime windows to your opening hours (see [Time zone](#time-zone)).
 
 To use an external scheduler instead, set `LOOYAAL_SCHEDULER=off` and call the same endpoints:
 
