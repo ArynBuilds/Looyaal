@@ -1,0 +1,59 @@
+name: Bug report
+description: Something does not work as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please do not report security vulnerabilities here; see SECURITY.md.
+        Remove phone numbers, names and secrets from logs before pasting them.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Customer app (PWA)
+        - Barista app
+        - Owner dashboard
+        - Onboarding / brand extraction
+        - Intelligence engines / notifications
+        - Integrations (weather, Google reviews, Instagram, POS)
+        - Self-hosting / Docker
+        - Documentation
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to ...
+        2. Tap ...
+        3. See ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v0.1.0 or a commit SHA
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Host OS, Docker version, browser and device (for PWA issues), HTTPS or not.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Output of `docker compose logs app` (and `migrate` if relevant).
+      render: text

@@ -1,0 +1,21 @@
+/* Owner login — cream theme tokens */
+.auth-page {
+  --bg: #F5ECE2;
+  --bg-2: #EEE1D1;
+  --bg-3: #E6D4BE;
+  --fg: #1A0F08;
+  --fg-dim: #5E4D40;
+  --fg-mute: #8B7A6A;
+  --brand: #FB3806;
+  --brand-soft: #FD8869;
+  --brand-deep: #C82C04;
+  --card: #FBF4EA;
+  --line: #E6D4BE;
+  background:
+    radial-gradient(ellipse 1200px 800px at 85% -10%, rgba(251,56,6,0.22), transparent 60%),
+    radial-gradient(ellipse 900px 600px at -10% 20%, rgba(251,56,6,0.08), transparent 60%),
+    var(--bg);
+  color: var(--fg);
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
