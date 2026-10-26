@@ -18,6 +18,10 @@ Turn your website into a branded, installable loyalty app in minutes, then let a
 
 ---
 
+![Owner dashboard with demo data](docs/images/dashboard.png)
+
+![Live app editor](docs/images/app-editor.png)
+
 Looyaal gives a single cafe (with any number of branches) three things that normally require a chain-sized budget:
 
 1. **A branded customer app** generated from the cafe's own website. Colors, logo, typography and layout are extracted and mapped onto a library of 113 UI components, delivered as an app customers install straight from the browser. No app store, no per-cafe build.
